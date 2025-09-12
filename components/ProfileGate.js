@@ -40,7 +40,7 @@ export function ProfileGate({ children }) {
             <UserPlus className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
             <CardTitle className="text-white text-2xl font-bold">Create Your Profile</CardTitle>
             <CardDescription className="text-gray-400 mt-2">
-              To rent, upload, and mint memes on CineVault, you need to create a user profile first.
+              To rent, upload, and mint memes on Drishya, you need to create a user profile first.
             </CardDescription>
           </CardHeader>
           <CardContent>

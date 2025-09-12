@@ -40,7 +40,7 @@ export function Navbar() {
         <div className="flex justify-between items-center h-20">
           <Link href="/" className="flex items-center space-x-2 group shrink-0">
             <Clapperboard className="h-8 w-8 text-teal-400 transition-transform duration-300 ease-in-out group-hover:rotate-[-12deg]" />
-            <span className="text-xl font-extrabold tracking-tight hidden sm:inline bg-gradient-to-r from-teal-300 to-cyan-400 bg-clip-text text-transparent">CineVault</span>
+            <span className="text-xl font-extrabold tracking-tight hidden sm:inline bg-gradient-to-r from-teal-300 to-cyan-400 bg-clip-text text-transparent">Drishya</span>
           </Link>
 
           {/* Desktop Navigation */}

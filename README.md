@@ -1,6 +1,6 @@
-# 🎬 CineVault – Decentralized Film Distribution Platform
+# 🎬 Drishya – Decentralized Film Distribution Platform
 
-CineVault is a **next-generation decentralized film distribution and rental platform** built on the **Camp Blockchain**.  
+Drishya is a **next-generation decentralized film distribution and rental platform** built on the **Camp Blockchain**.  
 It reshapes the relationship between filmmakers and their audience by **removing centralized intermediaries**, ensuring **fair monetization**, and offering a **censorship-resistant home** for creative work.
 
 ---
@@ -23,13 +23,13 @@ This creates a severe **power imbalance** for independent creators:
 
 ---
 
-## ✨ The CineVault Solution
+## ✨ The Drishya Solution
 
-CineVault solves these problems by leveraging **Web3 technology** and the **Camp Blockchain**:
+Drishya solves these problems by leveraging **Web3 technology** and the **Camp Blockchain**:
 
 | Feature | Benefit |
 |---------|---------|
-| **🎥 Creator Sovereignty** | Immutable smart contracts remove CineVault as the intermediary. |
+| **🎥 Creator Sovereignty** | Immutable smart contracts remove Drishya as the intermediary. |
 | **⚡ Fair & Instant Payments** | 90% of rental revenue paid instantly to creators’ wallets. |
 | **🛡 Censorship Resistance** | Films stored on IPFS via Camp Origin SDK – resilient & tamper-proof. |
 | **🌍 Permissionless Access** | Anyone can upload films and monetize globally. |
@@ -89,8 +89,8 @@ CineVault solves these problems by leveraging **Web3 technology** and the **Camp
 ### 📦 Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/cinevault.git
-cd cinevault
+git clone https://github.com/your-username/Drishya.git
+cd Drishya
 
 # Install dependencies
 pnpm install
