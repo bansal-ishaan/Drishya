@@ -9,21 +9,30 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Menu, Clapperboard, Compass, User, History, Upload, Image as ImageIcon } from 'lucide-react'
 
-// Define all possible navigation items in one place for consistency
-const navLinks = [
-    { href: '/explore', label: 'Explore Movies', icon: Compass },
-    { href: '/memes', label: 'Meme Gallery', icon: ImageIcon },
-    { href: '/history', label: 'My Rentals', icon: History, connected: true }, // 'connected: true' means only show if wallet is connected
-    { href: '/profile', label: 'My Profile', icon: User, connected: true },
-]
 
 export function Navbar() {
   const { isConnected } = useAccount()
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
 
-  // This filters the navLinks array based on whether the user's wallet is connected
-  const navItemsToDisplay = navLinks.filter(link => !link.connected || isConnected);
+  const productionPaths = ['/profile', '/upload']
+  const isProductionHousePortal = productionPaths.some(path => pathname.startsWith(path));
+
+  const userNavItems = [
+    { href: '/explore', label: 'Explore Movies', icon: Compass },
+    { href: '/memes', label: 'Meme Gallery', icon: ImageIcon },
+    ...(isConnected ? [
+        { href: '/history', label: 'My Rentals', icon: History },
+        { href: '/viewerprofile', label: 'My Profile', icon: User }
+    ] : [])
+  ];
+
+  const productionNavItems = [
+    { href: '/profile', label: 'My Profile', icon: User },
+    ...(isConnected ? [{ href: '/upload', label: 'Upload Movie', icon: Upload }] : [])
+  ];
+
+  const navItemsToDisplay = isProductionHousePortal ? productionNavItems : userNavItems;
 
   return (
     <nav className="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
@@ -49,14 +58,6 @@ export function Navbar() {
                 })}
             </div>
 
-            {isConnected && (
-                 <Link href="/upload" passHref>
-                    <Button variant="outline" size="sm" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-white font-bold">
-                        <Upload className="mr-2 h-4 w-4"/> Upload Movie
-                    </Button>
-                </Link>
-            )}
-
             <div className="pl-2">
               <ConnectButton />
             </div>
@@ -80,12 +81,6 @@ export function Navbar() {
                       </Link>
                      )
                   })}
-                  {isConnected && (
-                       <Link href={'/upload'} className={`flex items-center space-x-3 p-3 rounded-lg text-lg transition-colors ${pathname.startsWith('/upload') ? 'bg-teal-500/20 text-teal-300' : 'text-gray-300 hover:bg-gray-800'}`} onClick={() => setIsOpen(false)}>
-                        <Upload className="h-5 w-5" />
-                        <span>Upload Movie</span>
-                       </Link>
-                  )}
                   <div className="pt-4 border-t border-gray-800"><ConnectButton /></div>
                 </div>
               </SheetContent>

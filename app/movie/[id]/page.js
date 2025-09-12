@@ -8,8 +8,8 @@ import { motion } from 'framer-motion'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs' // Re-added Tabs
-import { Play, Star, User, DollarSign, Loader2, CheckCircle, Info, Video, Wallet, XCircle, Sparkles, Minus, Plus } from 'lucide-react' // Re-added more icons
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Play, Star, User, DollarSign, Loader2, CheckCircle, Info, Video, Wallet, XCircle, Sparkles, Minus, Plus } from 'lucide-react'
 import { CONTRACT_ADDRESS, CONTRACT_ABI, handleContractError } from '@/lib/contract'
 import { useToast } from '@/hooks/use-toast'
 import { Label } from '@/components/ui/label'
@@ -26,11 +26,12 @@ export default function MoviePage() {
   const { address, isConnected } = useAccount()
   const { toast } = useToast()
   const [rentalDays, setRentalDays] = useState(1)
-  const [playerState, setPlayerState] = useState('trailer')
+  
+  // Player state controls what is shown in the video area
+  const [playerState, setPlayerState] = useState('trailer') // States: 'trailer', 'rented_overlay', 'playing_full_movie'
 
   useEffect(() => { setIsMounted(true) }, [])
 
-  // Wagmi hook returns an array for a struct.
   const { data: movieData, isLoading: isLoadingMovie } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
@@ -39,7 +40,6 @@ export default function MoviePage() {
     enabled: isMounted && !!id,
   })
 
-  // Parse the raw array into a structured object for easier access.
   const movie = useMemo(() => {
     if (!movieData) return null
     return {
@@ -78,31 +78,30 @@ export default function MoviePage() {
 
   const hasActiveDiscount = useMemo(() => {
     if (!userProfile) return false
-    const hasDiscount = userProfile[2]
-    const expiryTimestamp = Number(userProfile[3]) * 1000
-    return hasDiscount && expiryTimestamp > Date.now()
+    return userProfile[2] && (Number(userProfile[3]) * 1000 > Date.now())
   }, [userProfile])
 
-  // --- VITAL FIX: All calculations now use BigInts ---
   const totalCost = useMemo(() => {
-    if (!movie || !movie.pricePerDay) return 0n // Return a BigInt `0`
-    
-    const pricePerDayBigInt = movie.pricePerDay; // It's already a BigInt
-    const rentalDaysBigInt = BigInt(rentalDays); // Convert rentalDays to a BigInt
-    
-    const baseCost = pricePerDayBigInt * rentalDaysBigInt; // Now this is safe
-
+    if (!movie || !movie.pricePerDay) return 0n
+    const baseCost = movie.pricePerDay * BigInt(rentalDays)
     if (hasActiveDiscount) {
-      // Use BigInts for discount calculation too to avoid mixing types
-      return (baseCost * 80n) / 100n; // 80n and 100n are BigInt literals
+      return (baseCost * 80n) / 100n
     }
-    return baseCost;
+    return baseCost
   }, [movie, rentalDays, hasActiveDiscount]);
 
   useEffect(() => {
-    if (hasRental) setPlayerState('rented_overlay')
-    else setPlayerState('trailer')
-  }, [hasRental])
+    // This effect now correctly controls the player state based on rental status
+    if (hasRental) {
+      // If user has a rental, but is not currently playing the full movie, show the overlay.
+      // This prevents the player from reverting to the overlay when the movie ends.
+      if (playerState !== 'playing_full_movie') {
+          setPlayerState('rented_overlay');
+      }
+    } else {
+      setPlayerState('trailer');
+    }
+  }, [hasRental, playerState])
 
   useEffect(() => {
     if (isSuccess) {
@@ -128,39 +127,85 @@ export default function MoviePage() {
     }
   }
   
-  const handleWatchNow = () => { /* Player logic */ };
+  const handleWatchNow = () => {
+    if (movie && movie.filmCID) {
+      setPlayerState('playing_full_movie');
+    } else {
+      toast({
+        title: "Playback Error",
+        description: "The full movie file (filmCID) could not be found.",
+        variant: "destructive",
+      })
+    }
+  };
 
   const handleDaysChange = (amount) => {
     setRentalDays(prev => Math.max(1, prev + amount))
   }
 
-  if (!isMounted || isLoadingMovie) {
-    return <Loader />
-  }
+  if (!isMounted || isLoadingMovie) return <Loader />
 
-  // A valid movie should have an ID greater than 0
-  if (!movie || movie.id === 0n) {
-    return (
+  if (!movie || movie.id === 0n) return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <Card className="bg-gray-800 border-gray-700 max-w-md text-center"><CardHeader><XCircle className="h-16 w-16 text-red-400 mx-auto mb-4" /><CardTitle className="text-white text-2xl font-bold">Movie Not Found</CardTitle><CardDescription className="text-gray-400">Could not find a movie with the specified ID.</CardDescription></CardHeader></Card>
+        <Card className="bg-gray-800 border-gray-700 max-w-md text-center"><CardHeader><XCircle className="h-16 w-16 text-red-400 mx-auto mb-4" /><CardTitle>Movie Not Found</CardTitle></CardHeader></Card>
       </div>
-    )
-  }
+  )
   
   const ownerIsRenter = isConnected && address?.toLowerCase() === movie.owner?.toLowerCase();
-
 
   return (
     <div className="min-h-screen bg-gray-900 text-white py-12 pt-24 md:py-16 md:pt-28">
       <BackgroundAnimation />
       <motion.div className="max-w-7xl mx-auto px-4" initial="hidden" animate="visible" >
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column */}
+          {/* --- Left Column --- */}
           <motion.div className="lg:col-span-2 space-y-8">
-             {/* Player card should have player logic added back */}
-             <Card className="bg-gray-800 border-gray-700 overflow-hidden">
-                {/* ... your player video/overlay logic ... */}
-             </Card>
+            {/* === THIS IS THE CORRECTED PLAYER CARD === */}
+            <Card className="bg-gray-800 border-gray-700 overflow-hidden">
+              <div className="aspect-video bg-black flex items-center justify-center relative">
+                {(() => {
+                  switch (playerState) {
+                    case 'playing_full_movie':
+                      return (
+                        <video controls autoPlay className="w-full h-full" key={movie.filmCID}>
+                          <source src={`https://gateway.pinata.cloud/ipfs/${movie.filmCID}`} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      );
+                    case 'rented_overlay':
+                      return (
+                        <>
+                          <img src={movie.thumbnailCID ? `https://gateway.pinata.cloud/ipfs/${movie.thumbnailCID}` : `/placeholder.svg`} alt={movie.title} className="w-full h-full object-cover blur-sm brightness-50" />
+                          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                            <CheckCircle className="h-20 w-20 text-teal-400 mb-4" />
+                            <h2 className="text-3xl font-bold">You have access to this movie</h2>
+                            <p className="text-gray-300 mt-2">Enjoy your rental!</p>
+                            <Button onClick={handleWatchNow} size="lg" className="mt-6 bg-teal-500 hover:bg-teal-600 font-bold">
+                              <Play className="mr-2 h-5 w-5" /> Watch Full Movie
+                            </Button>
+                          </div>
+                        </>
+                      );
+                    default: // 'trailer' state
+                      return movie.trailerCID ? (
+                        <video controls className="w-full h-full" poster={movie.thumbnailCID ? `https://gateway.pinata.cloud/ipfs/${movie.thumbnailCID}` : ''}>
+                          <source src={`https://gateway.pinata.cloud/ipfs/${movie.trailerCID}`} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      ) : (
+                        // Fallback if no trailer is available
+                        <div className="w-full h-full flex items-center justify-center">
+                            <img src={movie.thumbnailCID ? `https://gateway.pinata.cloud/ipfs/${movie.thumbnailCID}` : `/placeholder.svg`} alt={movie.title} className="w-full h-full object-cover"/>
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                <p className="text-gray-300">No Trailer Available</p>
+                            </div>
+                        </div>
+                      );
+                  }
+                })()}
+              </div>
+            </Card>
+
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader><div className="flex flex-col md:flex-row justify-between items-start gap-4"><div><CardTitle className="text-4xl font-extrabold mb-3">{movie.title}</CardTitle><div className="flex gap-2"><Badge className="bg-cyan-500 text-white">{movie.genre || 'N/A'}</Badge></div></div><div className="flex items-center gap-2 text-yellow-400 text-lg font-semibold bg-gray-900 px-3 py-1.5 rounded-lg shrink-0"><Star className="h-5 w-5 fill-current" /><span>{Number(movie.rentalCount)} Rentals</span></div></div></CardHeader>
               <CardContent>

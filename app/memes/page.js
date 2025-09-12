@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { useConfig } from 'wagmi' 
-import { readContract, readContracts } from 'wagmi/actions' 
+import { useState, useMemo } from 'react'
+import { useConfig, useReadContract } from 'wagmi' 
+import { readContract } from 'wagmi/actions' 
+import { useQueries } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { BackgroundAnimation } from "@/components/BackgroundAnimation"
@@ -12,6 +13,7 @@ import { Image as ImageIcon, Sparkles, Loader2, PartyPopper } from 'lucide-react
 import Link from 'next/link'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '@/lib/contract'
 import { ProfileGate } from '@/components/ProfileGate'
+
 // Loader for initial page load
 const PageLoader = () => (
     <div className="flex flex-col items-center justify-center gap-4 text-center">
@@ -25,90 +27,58 @@ const PageLoader = () => (
 );
 
 export default function MemesPage() {
-    const [allMemes, setAllMemes] = useState([])
-    const [isLoading, setIsLoading] = useState(true)
     const wagmiConfig = useConfig();
-    const [totalMemeCount, setTotalMemeCount] = useState(0);
 
-    // Fetch the total number of memes first
-    useEffect(() => {
-        const fetchMemeCount = async () => {
-            try {
-                const count = await readContract(wagmiConfig, {
-                    address: CONTRACT_ADDRESS,
-                    abi: CONTRACT_ABI,
-                    functionName: 'memeCount',
-                });
-                setTotalMemeCount(Number(count));
-            } catch (error) {
-                console.error("Failed to fetch meme count:", error);
-            }
-        };
-        fetchMemeCount();
-    }, [wagmiConfig]);
+    // 1. Fetch the total number of memes using the wagmi hook.
+    // This will AUTOMATICALLY refetch when the blockchain state changes.
+    const { data: memeCountData, isLoading: isLoadingCount } = useReadContract({
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'memeCount',
+        // This tells wagmi to watch for changes and refetch often
+        watch: true, 
+    });
 
+    // Safely convert the BigInt count to a Number for use in loops
+    const totalMemeCount = useMemo(() => memeCountData ? Number(memeCountData) : 0, [memeCountData]);
 
-    // Fetch all memes in a single batch call once we have the count
-    useEffect(() => {
-        if (totalMemeCount === 0) {
-            setIsLoading(false);
-            return;
-        }
-
-        const fetchAllMemes = async () => {
-            setIsLoading(true);
-            try {
-                // Create an array of contract calls, from ID 1 to totalMemeCount
-                const memeContracts = Array.from({ length: totalMemeCount }, (_, i) => ({
+    // 2. Use `useQueries` (from TanStack Query) to batch-fetch all memes.
+    // This is the correct hook for fetching a dynamic list of items.
+    const memeQueries = useQueries({
+        queries: totalMemeCount > 0 
+            ? Array.from({ length: totalMemeCount }, (_, i) => ({
+                queryKey: ['meme', i + 1], // Unique key for each meme
+                queryFn: () => readContract(wagmiConfig, { // The function to run
                     address: CONTRACT_ADDRESS,
                     abi: CONTRACT_ABI,
                     functionName: 'memes',
                     args: [BigInt(i + 1)],
-                }));
+                }),
+            }))
+            : [], // Return an empty array if count is 0, to prevent errors
+    });
 
-                const results = await readContracts(wagmiConfig, {
-                    contracts: memeContracts,
-                });
-                
-                // The result is an array of objects, get the `result` from each
-                const memesData = results.map(res => res.result).filter(Boolean);
+    // 3. Process the results from `useQueries`.
+    const allMemes = useMemo(() => {
+        // We get an array of query results; we want the `data` from each.
+        const memesData = memeQueries.map(res => res.data).filter(Boolean);
+        // Sort by newest first (highest ID)
+        return memesData.sort((a, b) => Number(b.id) < Number(a.id) ? 1 : -1);
+    }, [memeQueries]);
 
-                // Sort by newest first (highest ID)
-                const sortedMemes = memesData.sort((a, b) => Number(b.id) - Number(a.id));
-                setAllMemes(sortedMemes);
-                
-            } catch (error) {
-                console.error("Failed to fetch memes:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchAllMemes();
-    }, [totalMemeCount, wagmiConfig]);
-    
+    // Determine the overall loading state. We are loading if the count is loading,
+    // or if the meme queries are running.
+    const isLoading = isLoadingCount || (totalMemeCount > 0 && memeQueries.some(q => q.isLoading));
 
     const containerVariants = {
         hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.05 },
-        },
-    }
+        visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+    };
 
     const itemVariants = {
         hidden: { y: 20, opacity: 0, scale: 0.95 },
         visible: { y: 0, opacity: 1, scale: 1 },
-    }
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-gray-900 flex items-center justify-center relative">
-                <BackgroundAnimation />
-                <PageLoader />
-            </div>
-        )
-    }
+    };
 
     return (
         <ProfileGate>
@@ -138,8 +108,9 @@ export default function MemesPage() {
                     </Link>
                 </motion.div>
                 
-
-                {allMemes.length === 0 ? (
+                {isLoading ? (
+                    <PageLoader />
+                ) : allMemes.length === 0 ? (
                     <motion.div className="text-center py-16" variants={itemVariants}>
                         <ImageIcon className="h-16 w-16 mx-auto text-gray-600 mb-4" />
                         <p className="text-gray-400 text-2xl font-semibold">The gallery is empty!</p>
@@ -152,28 +123,32 @@ export default function MemesPage() {
                         initial="hidden"
                         animate="visible"
                     >
-                        {allMemes.map((meme) => (
-                            <motion.div key={meme.id} variants={itemVariants}>
-                                <Card className="bg-gray-800 border-gray-700 hover:border-violet-500 transition-colors duration-300 overflow-hidden group relative aspect-square">
-                                    {meme.isSpotlighted && (
-                                        <Badge className="absolute top-2 right-2 z-10 bg-yellow-400 text-black font-bold shadow-lg">
-                                            <Sparkles className="h-4 w-4 mr-1.5 animate-pulse"/>
-                                            Spotlight!
-                                        </Badge>
-                                    )}
-                                    <img
-                                        src={`https://gateway.pinata.cloud/ipfs/${meme.imageCID}`}
-                                        alt={meme.title}
-                                        className="w-full h-full object-cover transition-transform duration-400 group-hover:scale-110"
-                                        loading="lazy"
-                                    />
-                                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3">
-                                        <p className="text-white font-bold text-base truncate transition-all group-hover:text-violet-300">{meme.title}</p>
-                                        <p className="text-gray-400 text-xs font-mono truncate">{meme.creator}</p>
-                                    </div>
-                                </Card>
-                            </motion.div>
-                        ))}
+                        {allMemes.map((meme) => {
+                            // Struct from wagmi/viem returns values in an array
+                            const [id, creator, title, imageCID, createdAt, isSpotlighted] = meme;
+                            return (
+                                <motion.div key={String(id)} variants={itemVariants}>
+                                    <Card className="bg-gray-800 border-gray-700 hover:border-violet-500 transition-colors duration-300 overflow-hidden group relative aspect-square">
+                                        {isSpotlighted && (
+                                            <Badge className="absolute top-2 right-2 z-10 bg-yellow-400 text-black font-bold shadow-lg">
+                                                <Sparkles className="h-4 w-4 mr-1.5 animate-pulse"/>
+                                                Spotlight!
+                                            </Badge>
+                                        )}
+                                        <img
+                                            src={`https://gateway.pinata.cloud/ipfs/${imageCID}`}
+                                            alt={title}
+                                            className="w-full h-full object-cover transition-transform duration-400 group-hover:scale-110"
+                                            loading="lazy"
+                                        />
+                                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3">
+                                            <p className="text-white font-bold text-base truncate transition-all group-hover:text-violet-300">{title}</p>
+                                            <p className="text-gray-400 text-xs font-mono truncate">{creator}</p>
+                                        </div>
+                                    </Card>
+                                </motion.div>
+                            )
+                        })}
                     </motion.div>
                 )}
             </motion.div>
