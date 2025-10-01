@@ -213,7 +213,7 @@ export default function MintMemePage() {
                                     <DollarSign className="h-4 w-4 text-violet-400" />
                                     <AlertTitle className="text-white">Minting Fee</AlertTitle>
                                     <AlertDescription className="text-gray-400 mt-1">
-                                        A one-time fee of <strong className="text-violet-300">{memeFee ? (Number(memeFee) / 1e18).toFixed(4) : '...'} STT</strong> is required.
+                                        A one-time fee of <strong className="text-violet-300">{memeFee ? (Number(memeFee) / 1e18).toFixed(4) : '0'} Eth</strong> is required.
                                     </AlertDescription>
                                 </Alert>
                             </CardContent>

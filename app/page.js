@@ -76,7 +76,7 @@ export default function PortalChoicePage() {
 
           <Clapperboard className="h-14 w-14 mx-auto text-cyan-300 drop-shadow-[0_0_15px_rgba(0,255,255,0.6)]" />
           <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase mt-6 bg-gradient-to-r from-white via-cyan-200 to-gray-400 bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(0,255,255,0.5)]">
-            CINEVAULT
+            Drishya
           </h1>
           <p className="text-lg text-gray-400 max-w-xl mx-auto mt-4 italic tracking-wide">
             🎬 The future of film is here — choose your portal and step into the reel world.

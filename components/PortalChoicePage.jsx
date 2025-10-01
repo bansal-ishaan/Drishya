@@ -85,7 +85,7 @@ export default function PortalChoicePage() {
         <motion.div variants={itemVariants} className="mb-12">
           <Clapperboard className="h-14 w-14 mx-auto text-cyan-300 drop-shadow-lg animate-pulse" />
           <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase mt-6 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(0,255,255,0.4)]">
-            CINEVAULT
+            Drishya
           </h1>
           <p className="text-lg text-gray-300 max-w-xl mx-auto mt-4 italic">
             The future of film is here — step into your portal and start your cinematic journey.

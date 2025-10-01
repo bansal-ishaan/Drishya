@@ -17,8 +17,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className="dark">
       <Head>
-        <title>CineVault - Decentralized Movie Platform</title>
-        <meta name="CineVault" content="Upload, rent, and watch movies on a decentralized platform." />
+        <title>Drishya - Decentralized Movie Platform</title>
+        <meta name="Drishya" content="Upload, rent, and watch movies on a decentralized platform." />
       </Head>
       <body className={`${inter.className} bg-gray-900`}>
         <Providers>

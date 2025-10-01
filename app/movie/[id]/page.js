@@ -227,13 +227,13 @@ export default function MoviePage() {
                 <CardContent>
                   {hasRental ? (<div className="text-center py-6"><div className="bg-teal-500/10 border border-teal-500/20 rounded-lg p-4"><p className="text-teal-300 font-semibold">You already have an active rental.</p><p className="text-gray-400 text-sm">You can watch the movie now.</p></div></div>) : (
                     <div className="space-y-4">
-                      <div className="text-center border-b border-gray-700 pb-4"><p className="text-gray-400 text-sm">Price Per Day</p><p className="text-2xl font-bold text-teal-400">{formatPrice(movie.pricePerDay)} <span className="text-lg">STT</span></p></div>
+                      <div className="text-center border-b border-gray-700 pb-4"><p className="text-gray-400 text-sm">Price Per Day</p><p className="text-2xl font-bold text-teal-400">{formatPrice(movie.pricePerDay)} <span className="text-lg">Eth</span></p></div>
                       <div className="space-y-2 text-center"><Label htmlFor="days" className="font-semibold text-lg">Select Rental Duration</Label><div className="flex items-center justify-center gap-4"><Button size="icon" variant="outline" onClick={() => handleDaysChange(-1)} disabled={rentalDays <= 1}><Minus className="h-4 w-4" /></Button><h2 className="text-3xl font-bold w-16 text-center">{rentalDays}</h2><Button size="icon" variant="outline" onClick={() => handleDaysChange(1)}><Plus className="h-4 w-4" /></Button></div><p className="text-gray-500 text-sm">{rentalDays} Day{rentalDays > 1 ? 's' : ''} of access</p></div>
                       {hasActiveDiscount && (<div className="bg-yellow-500/10 text-yellow-300 p-3 rounded-lg text-center text-sm"><p className="font-bold flex items-center justify-center"><Sparkles className="mr-2 h-4 w-4" /> 20% Spotlight Discount Applied!</p></div>)}
                       <div className="text-center pt-3">
                         <p className="text-gray-400 text-sm">Total Price</p>
-                        <p className="text-4xl font-bold text-teal-400">{formatPrice(totalCost)} <span className="text-2xl">STT</span></p>
-                        {hasActiveDiscount && (<p className="text-xs text-gray-500 line-through">Original: {formatPrice(movie.pricePerDay * BigInt(rentalDays))} STT</p>)}
+                        <p className="text-4xl font-bold text-teal-400">{formatPrice(totalCost)} <span className="text-2xl">Eth</span></p>
+                        {hasActiveDiscount && (<p className="text-xs text-gray-500 line-through">Original: {formatPrice(movie.pricePerDay * BigInt(rentalDays))} Eth</p>)}
                       </div>
                       <Button onClick={handleRent} disabled={!isConnected || isPending || isConfirming || ownerIsRenter} size="lg" className="w-full bg-teal-500 hover:bg-teal-600 font-bold text-lg h-14 disabled:bg-gray-600">
                         {!isConnected ? <><Wallet className="mr-2 h-5 w-5" />Connect Wallet</> : ownerIsRenter ? <><XCircle className="mr-2 h-5 w-5" />Cannot Rent Own Movie</> : isPending || isConfirming ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Processing...</> : <><Play className="mr-2 h-5 w-5" />Rent Now</>}

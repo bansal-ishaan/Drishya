@@ -131,8 +131,8 @@ export default function UploadPage() {
     }
   };
   
-  // MODIFIED: Use new currency and fetch the correct fee (0.0001 STT)
-  const uploadFeeSTT = useMemo(() => (uploadFee ? (Number(uploadFee) / 1e18).toFixed(4) : "0.0001"), [uploadFee]);
+  // MODIFIED: Use new currency and fetch the correct fee (0.0001 Eth)
+  const uploadFeeEth = useMemo(() => (uploadFee ? (Number(uploadFee) / 1e18).toFixed(4) : "0.0001"), [uploadFee]);
   const userHasProfile = userProfile && userProfile[1];
 
   if (status === 'success') {
@@ -145,7 +145,7 @@ export default function UploadPage() {
             <CardHeader>
               <PartyPopper className="h-20 w-20 text-teal-400 mx-auto" />
               <CardTitle className="text-3xl font-bold text-white mt-4">Upload Successful!</CardTitle>
-              <CardDescription className="text-gray-400">Your movie is now live on the CineVault platform.</CardDescription>
+              <CardDescription className="text-gray-400">Your movie is now live on the Drishya platform.</CardDescription>
             </CardHeader>
              <CardContent>
               {/* MODIFIED: Updated to Somnia testnet explorer URL */}
@@ -168,7 +168,7 @@ export default function UploadPage() {
       <motion.div className="max-w-4xl mx-auto px-4" initial="hidden" animate="visible" variants={{hidden: {opacity:0, y:20}, visible: {opacity:1,y:0}}}>
         <div className="text-center mb-10">
           <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-teal-400 to-cyan-500 bg-clip-text text-transparent">Upload Your Movie</h1>
-          <p className="text-gray-400 text-lg">Share your creation with the CineVault community.</p>
+          <p className="text-gray-400 text-lg">Share your creation with the Drishya community.</p>
         </div>
 
         {isConnected && !userHasProfile && (
@@ -184,7 +184,7 @@ export default function UploadPage() {
                 <h3 className="text-2xl font-semibold text-white border-l-4 border-teal-500 pl-4">Movie Details</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2"><Label htmlFor="title">Movie Title <span className="text-red-500">*</span></Label><Input id="title" name="title" value={formData.title} onChange={handleInputChange} required disabled={isProcessing} placeholder="e.g., The Decentralized Dream" /></div>
-                  <div className="space-y-2"><Label htmlFor="pricePerDay">Price Per Day (STT) <span className="text-red-500">*</span></Label><Input id="pricePerDay" name="pricePerDay" type="number" step="0.0001" min="0.0001" value={formData.pricePerDay} onChange={handleInputChange} required disabled={isProcessing} placeholder="e.g., 0.005" /></div>
+                  <div className="space-y-2"><Label htmlFor="pricePerDay">Price Per Day (Eth) <span className="text-red-500">*</span></Label><Input id="pricePerDay" name="pricePerDay" type="number" step="0.0001" min="0.0001" value={formData.pricePerDay} onChange={handleInputChange} required disabled={isProcessing} placeholder="e.g., 0.005" /></div>
                 </div>
                 <div className="space-y-2"><Label htmlFor="description">Description</Label><Textarea id="description" name="description" value={formData.description} onChange={handleInputChange} rows={4} disabled={isProcessing} placeholder="A short synopsis of your movie..." /></div>
                 <div className="space-y-2"><Label>Genre</Label><Select name="genre" value={formData.genre} onValueChange={(v) => setFormData(p => ({ ...p, genre: v }))} disabled={isProcessing}><SelectTrigger><SelectValue placeholder="Select genre" /></SelectTrigger><SelectContent>{genres.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent></Select></div>
@@ -201,7 +201,7 @@ export default function UploadPage() {
 
               <Alert className="bg-gray-900/70 border-gray-700">
                   <UploadCloud className="h-4 w-4 text-cyan-400" /><AlertTitle className="text-white">Platform Fee</AlertTitle>
-                  <AlertDescription className="text-gray-400 mt-2">A one-time fee of <strong className="text-cyan-300">{uploadFeeSTT} STT</strong> is required to upload your movie.</AlertDescription>
+                  <AlertDescription className="text-gray-400 mt-2">A one-time fee of <strong className="text-cyan-300">{uploadFeeEth} Eth</strong> is required to upload your movie.</AlertDescription>
               </Alert>
             </CardContent>
             <CardFooter className="bg-gray-800 p-6">
