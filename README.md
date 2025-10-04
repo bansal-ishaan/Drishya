@@ -1,19 +1,20 @@
 # 🎬 Drishya – Decentralized Film Distribution Platform
 
-Drishya is a **next-generation decentralized film distribution and rental platform** built on the **Camp Blockchain**.  
+Drishya is a **next-generation decentralized film distribution and rental platform** built on the **Ethereum Blockchain**.
 It reshapes the relationship between filmmakers and their audience by **removing centralized intermediaries**, ensuring **fair monetization**, and offering a **censorship-resistant home** for creative work.
 
 ---
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Powered by: Camp Blockchain](https://img.shields.io/badge/Powered%20by-Camp%20Blockchain-22d3ee)
+![Powered by: Ethereum Blockchain](https://img.shields.io/badge/Powered%20by-Ethereum%20Blockchain-627EEA?logo=ethereum)
 ![Deployment: Vercel](https://img.shields.io/badge/Deployment-Vercel-black?logo=vercel)
+![Meme Spotlight: Chainlink VRF](https://img.shields.io/badge/Meme%20Spotlight-Chainlink%20VRF-375BD2?logo=chainlink)
 
 ---
 
 ## 🌟 The Problem
 
-The modern digital media landscape is dominated by centralized platforms that act as **powerful gatekeepers**.  
+The modern digital media landscape is dominated by centralized platforms that act as **powerful gatekeepers**.
 This creates a severe **power imbalance** for independent creators:
 
 - **💸 Extractive Fees** – Platforms often take **30–55%** of revenue with **opaque, delayed payments**.
@@ -25,14 +26,15 @@ This creates a severe **power imbalance** for independent creators:
 
 ## ✨ The Drishya Solution
 
-Drishya solves these problems by leveraging **Web3 technology** and the **Camp Blockchain**:
+Drishya solves these problems by leveraging **Web3 technology** and the **Ethereum Blockchain**:
 
 | Feature | Benefit |
 |---------|---------|
 | **🎥 Creator Sovereignty** | Immutable smart contracts remove Drishya as the intermediary. |
 | **⚡ Fair & Instant Payments** | 90% of rental revenue paid instantly to creators’ wallets. |
-| **🛡 Censorship Resistance** | Films stored on IPFS via Camp Origin SDK – resilient & tamper-proof. |
+| **🛡 Censorship Resistance** | Films stored on IPFS via specialized storage solutions – resilient & tamper-proof. |
 | **🌍 Permissionless Access** | Anyone can upload films and monetize globally. |
+| **🎁 Community Rewards** | Participate in the **Meme Spotlight** to win a 20% rental discount. |
 
 ---
 
@@ -46,6 +48,12 @@ Drishya solves these problems by leveraging **Web3 technology** and the **Camp B
   - Decentralized storage (IPFS + Pinata fallback)
   - Automated smart contract rental lifecycle
   - Wallet-based identity (MetaMask, RainbowKit)
+
+- **New Feature: Meme Spotlight**
+  - **User-Submitted Memes:** Viewers can upload relevant memes *free of cost* for community enjoyment.
+  - **Random Selection:** The platform **admin** can trigger the **Spotlight of the Day** to randomly select a winning meme.
+  - **Decentralized Randomness:** The selection process uses **Chainlink VRF (Verifiable Random Function)** for provably fair, tamper-proof randomness.
+  - **Reward:** The creator of the selected meme wins a **20% discount** on their next film rental transaction.
 
 - **Modern UI/UX**
   - Built with **Next.js**, **Tailwind CSS**, **Framer Motion**, **shadcn/ui**
@@ -62,16 +70,17 @@ Drishya solves these problems by leveraging **Web3 technology** and the **Camp B
 - Animations: `Framer Motion`
 
 **Web3 Integration**
-- Blockchain: `Camp Blockchain`
+- Blockchain: `Ethereum`
 - Wallet: `RainbowKit`
 - Contract Interaction: `wagmi`, `viem`
+- Randomness: `Chainlink VRF`
 
 **Smart Contract**
 - Language: `Solidity`
 - Dev Environment: `Hardhat` / `Foundry`
 
 **Storage**
-- Primary: `Camp Origin SDK (IPFS)`
+- Primary: `IPFS (via specialized SDK/Gateway)`
 - Fallback: `Pinata`
 
 **Deployment**
@@ -82,14 +91,14 @@ Drishya solves these problems by leveraging **Web3 technology** and the **Camp B
 ## 🏁 Getting Started
 
 ### 📋 Prerequisites
-- Node.js v18+  
-- `pnpm` / `npm` / `yarn`  
+- Node.js v18+
+- `pnpm` / `npm` / `yarn`
 - Web3 wallet (e.g., MetaMask)
 
 ### 📦 Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/Drishya.git
+git clone [https://github.com/your-username/Drishya.git](https://github.com/your-username/Drishya.git)
 cd Drishya
 
 # Install dependencies
